@@ -78,6 +78,15 @@ go build -o skrzynka ./cmd/server
 ./skrzynka
 ```
 
+### Swagger UI (API docs)
+
+The OpenAPI spec lives in **`api/openapi.yaml`**. The server serves it and an interactive Swagger UI:
+
+- **Spec (raw YAML):** [http://localhost:8080/openapi.yaml](http://localhost:8080/openapi.yaml)
+- **Swagger UI:** [http://localhost:8080/docs](http://localhost:8080/docs)
+
+With the server running, open **http://localhost:8080/docs** in a browser to explore and try the API. The UI loads the spec from `/openapi.yaml`; edit `api/openapi.yaml` and restart the server to see changes.
+
 ---
 
 ## Database
