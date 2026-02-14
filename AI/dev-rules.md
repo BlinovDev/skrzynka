@@ -18,10 +18,10 @@
 ## 4. Modular Architecture
 Each responsibility MUST live in its own package and encapsulate its logic:
 
-- internal/http       → handlers + router
-- internal/ws         → websocket hub & clients
-- internal/storage    → database + repositories
-- internal/config     → configuration loading
+- app/http       → handlers + router
+- app/ws         → websocket hub & clients
+- app/storage    → database + repositories
+- app/config     → configuration loading
 
 Rules:
 - Do not mix responsibilities between modules.

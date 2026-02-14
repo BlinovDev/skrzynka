@@ -1,0 +1,126 @@
+openapi: 3.0.3
+info:
+  title: anon-skrzynka API
+  description: Zero-knowledge message transport. Payload is opaque; no auth.
+  version: 0.1.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local
+
+paths:
+  /messages:
+    post:
+      summary: Create a new message
+      operationId: createMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMessageRequest'
+            example:
+              sender_id: "550e8400-e29b-41d4-a716-446655440000"
+              recipient_id: "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+              payload: "<opaque encrypted string>"
+      responses:
+        '201':
+          description: Message created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: Invalid body or missing required fields
+        '500':
+          description: Create failed
+    get:
+      summary: Get all messages for a dialog
+      operationId: getDialog
+      description: Returns messages between sender_id and recipient_id in both directions.
+      parameters:
+        - name: sender_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: recipient_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        '400':
+          description: sender_id and recipient_id required
+        '500':
+          description: Get dialog failed
+
+  /ws:
+    get:
+      summary: WebSocket connection for real-time messages
+      operationId: connectWebSocket
+      description: |
+        Upgrade to WebSocket. Server pushes new messages (JSON Message object) to clients
+        subscribed as sender or recipient. Query param user_id is required to identify the connection.
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: UUID of the user (participant) for this connection
+      responses:
+        '101':
+          description: Switching Protocols (WebSocket)
+        '400':
+          description: user_id required
+      tags:
+        - WebSocket
+
+components:
+  schemas:
+    CreateMessageRequest:
+      type: object
+      required:
+        - sender_id
+        - recipient_id
+        - payload
+      properties:
+        sender_id:
+          type: string
+          format: uuid
+        recipient_id:
+          type: string
+          format: uuid
+        payload:
+          type: string
+          description: Opaque payload (client-encrypted); server does not interpret
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Server-generated ID
+        sender_id:
+          type: string
+          format: uuid
+        recipient_id:
+          type: string
+          format: uuid
+        payload:
+          type: string
+        created_at:
+          type: string
+          format: date-time
