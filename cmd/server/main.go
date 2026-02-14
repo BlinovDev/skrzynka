@@ -40,7 +40,7 @@ func main() {
 	})
 	addr := ":" + cfg.HTTPPort
 	log.Printf("listening on %s", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	if err := http.ListenAndServe(addr, apphttp.CORS(mux, cfg.AllowedOrigins)); err != nil {
 		log.Fatal(err)
 	}
 }
